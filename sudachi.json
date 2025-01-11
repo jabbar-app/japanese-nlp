@@ -1,0 +1,11 @@
+{
+    "systemDict": "sudachidict_full",
+    "characterDefinitionFile": null,
+    "inputTextPlugin": [],
+    "oovProviderPlugin": [
+        {
+            "class": "com.worksap.nlp.sudachi.SimpleOovProviderPlugin"
+        }
+    ],
+    "pathRewritePlugin": []
+}
