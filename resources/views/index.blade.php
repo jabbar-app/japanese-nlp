@@ -6,17 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Japanese NLP Parser</title>
-
   <!-- Include CSS and JS using Vite -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-  <!-- Optional: Add some basic styling -->
+  <!-- Optional: Basic styling -->
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f8f9fa;
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
 
     h1 {

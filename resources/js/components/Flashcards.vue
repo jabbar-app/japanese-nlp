@@ -4,11 +4,15 @@
         <div class="flashcards">
             <div class="card-container" v-for="(morpheme, index) in morphemes" :key="index">
                 <div class="card" :class="{ flipped: flippedCards[index] }" @click="flipCard(index)">
-                    <!-- Bagian Depan Kartu -->
+                    <!-- Front Side -->
                     <div class="front">
                         <h3>{{ morpheme.surface }}</h3>
+                        <!-- Audio Playback Button -->
+                        <button class="audio-btn" @click.stop="playAudio(morpheme)">
+                            🔊
+                        </button>
                     </div>
-                    <!-- Bagian Belakang Kartu -->
+                    <!-- Back Side -->
                     <div class="back">
                         <p><strong>Dictionary Form:</strong> {{ morpheme.dictionary_form }}</p>
                         <p><strong>Reading Form:</strong> {{ morpheme.reading_form }}</p>
@@ -33,12 +37,24 @@ export default {
             flippedCards: [],
         };
     },
-    created() {
-        this.flippedCards = Array(this.morphemes.length).fill(false);
+    watch: {
+        morphemes: {
+            handler(newVal) {
+                this.flippedCards = Array(newVal.length).fill(false);
+            },
+            immediate: true,
+        },
     },
     methods: {
         flipCard(index) {
             this.flippedCards[index] = !this.flippedCards[index];
+        },
+        playAudio(morpheme) {
+            const utterance = new SpeechSynthesisUtterance(
+                morpheme.reading_form || morpheme.surface
+            );
+            utterance.lang = "ja-JP";
+            window.speechSynthesis.speak(utterance);
         },
     },
 };
@@ -49,25 +65,24 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 20px;
 }
 
 .flashcards {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 20px;
-    justify-content: center;
+    width: 100%;
 }
 
 .card-container {
-    width: 180px;
-    height: 240px;
     perspective: 1000px;
 }
 
 .card {
-    width: 100%;
-    height: 100%;
     position: relative;
+    width: 100%;
+    height: 240px;
     transition: transform 0.6s ease-in-out;
     transform-style: preserve-3d;
     cursor: pointer;
@@ -77,17 +92,20 @@ export default {
 }
 
 .card:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.02);
 }
 
 .card.flipped {
     transform: rotateY(180deg);
 }
 
+/* Pastikan posisi absolute dengan top dan left */
 .front,
 .back {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
@@ -106,6 +124,24 @@ export default {
     font-weight: bold;
     font-size: 24px;
     text-align: center;
+    position: relative;
+}
+
+.audio-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 18px;
+    transition: background 0.3s;
+}
+
+.audio-btn:hover {
+    background: #ffffff;
 }
 
 .back {
