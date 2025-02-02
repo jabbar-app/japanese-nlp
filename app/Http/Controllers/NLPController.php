@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Log;
 
 class NLPController extends Controller
 {
@@ -16,22 +17,26 @@ class NLPController extends Controller
         $sentence = $request->input('sentence');
         $pythonScriptPath = base_path('parser.py');
 
-        // Jalankan Python script
-        $process = new Process(['python', $pythonScriptPath, $sentence]);
+        // Gunakan python3 jika perlu, atau pastikan python menunjuk ke interpreter yang tepat
+        $process = new Process(['python3', $pythonScriptPath, $sentence]);
         $process->run();
 
-        // Jika terjadi error, kembalikan JSON error
+        // Jika terjadi error, log error dan kembalikan response JSON error
         if (!$process->isSuccessful()) {
+            Log::error("Error saat menjalankan parser.py: " . $process->getErrorOutput());
             return response()->json([
                 'error' => $process->getErrorOutput()
             ], 500);
         }
 
-        // Ambil hasil output
         $output = $process->getOutput();
         $parsedData = json_decode($output, true);
 
-        // Kembalikan JSON response
+        // Jika output tidak valid JSON, log outputnya juga
+        if (is_null($parsedData)) {
+            Log::error("Output dari parser.py tidak valid JSON: " . $output);
+        }
+
         return response()->json([
             'sentence' => $sentence,
             'morphemes' => $parsedData ?? []
